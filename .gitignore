@@ -1,0 +1,63 @@
+import numpy as np
+import pandas as pd
+
+df_can = pd.read_excel(
+	'C:/Users/junhe/Desktop/Documents/Python/Data_visualization_coursera/Canada.xlsx',
+	sheet_name = 'Canada by Citizenship',
+	skiprows=range(20),
+	skipfooter=2)
+print('data read into a pandas dataframe!')
+
+print(df_can.shape)
+
+#clean up the dataset to remove columns that are not informative to us for visualization
+df_can.drop(['AREA','REG', 'DEV', 'Type', 'Coverage'], axis= 1, inplace=True)
+df_can.head()
+
+#rename some of the columns so that they make sense
+df_can.rename(columns={'OdName':'Country', 'AreaName':'Continent', 'RegName':'Region'}, inplace=True)
+df_can.head()
+
+#For consistency, ensure that all column labels of type string.
+df_can.columns = list(map(str, df_can.columns))
+
+#set the country name as index-useful for quickly looking up countries using .loc method
+df_can.set_index('Country', inplace=True)
+df_can.head()
+
+#add total column
+df_can['Total'] = df_can.sum(axis=1)
+
+#creat a list of years from 1980 -2013
+years = list(map(str, range(1980, 2014)))
+years
+
+#visualizing data using matplotlib
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+#pie charts
+#group countries by continents and apply sum() fuction
+df_continents = df_can.groupby('Continent', axis=0).sum()
+
+print(type(df_can.groupby('Continent', axis=0)))
+
+df_continents.head()
+
+colors_list = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'lightgreen', 'pink']
+explode_list = [0.1, 0, 0, 0, 0.1, 0.1]
+
+df_continents['Total'].plot(kind='pie',
+                            figsize=(15, 6),
+                            autopct= '%1.1f%%',
+                            startangle=90,
+                            shadow=True,
+                            labels=None,
+                            pctdistance=1.12,
+                            colors=colors_list,
+                            explode=explode_list)
+                            
+plt.title('Immigration to Canada by Continent')
+plt.axis('equal')
+
+plt.show()
